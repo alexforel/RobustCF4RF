@@ -1,0 +1,12 @@
+# To install packages and dependencies, run:
+# conda env create --file environment.yml
+name: robustcf
+channels:
+  - gurobi
+  - https://conda.anaconda.org/gurobi
+  - defaults
+dependencies:
+  - python=3.9.7=h6244533_1
+  - gurobi=9.5.1=py39_0
+  - scikit-learn=0.24.2=py39hf11a4ad_1
+  - seaborn=0.11.2=pyhd3eb1b0_0
