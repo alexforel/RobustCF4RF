@@ -1,5 +1,5 @@
 # Robust Counterfactual Explanations for Random Forests
-This code can be used to reproduce all figures and results in the manuscript titled "Robust Counterfactual Explanations for Random Forests" available at: *add paper link here*.
+This code can be used to reproduce all figures and results in the manuscript titled "Robust Counterfactual Explanations for Random Forests" available at: https://arxiv.org/abs/2205.14116.
 
 ## Installation
 The project requires the Gurobi solver to be installed with an authorized license. Free academic licenses can be obtained at: https://www.gurobi.com/academia/academic-program-and-licenses/ .
