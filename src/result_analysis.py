@@ -45,22 +45,6 @@ def read_cost_and_validity_from_results_df(resultsDf, methoSensParameter,
     return cfValidity, cfCost
 
 
-def read_naive_costs(naiveDf, nbSimulations, datasetName):
-    # -- Read feature types from data file --
-    featuresType = get_feature_types(datasetName)
-    # -- Compute cost and validity --
-    naiveCosts = np.zeros((nbSimulations))
-    for x in range(nbSimulations):
-        # Read counterfactual cost according to l2 norm
-        x_init = np.fromstring(
-            naiveDf['x_init'].values[x][1:-1], dtype=float, sep=' ')
-        x_cf = np.fromstring(
-            naiveDf['x_cf'].values[x][1:-1], dtype=float, sep=' ')
-        naiveCosts[x] = compute_counterfactual_cost(
-            x_init, x_cf, featuresType)
-    return naiveCosts
-
-
 def get_feature_types(datasetName):
     dirname = os.path.dirname(os.path.dirname(__file__))
     filename = dirname+'/datasets/'+datasetName+'.csv'

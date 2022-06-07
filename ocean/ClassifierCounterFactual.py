@@ -77,7 +77,7 @@ class ClassifierCounterFactualMilp:
 
     def initSolution(self):
         """
-        Intialise decision variables for each feature of the search space.
+        Intialize decision variables for each feature of the search space.
         Specify the type and domain of each decision variable according to the
         type of feature.
         """

@@ -1,5 +1,5 @@
 """
-Analzse the results of the repetated experiments to generate robust counterfactuals:
+Analyze the results of the repetated experiments to generate robust counterfactuals:
 - read simulations results from csv files,
 - calculate kpis (cost and validity),
 - plot relevant figures,
@@ -17,7 +17,6 @@ from src.result_analysis import compute_kpis_and_confidence_intervals
 from src.result_analysis import export_results_csv
 from src.result_analysis import plot_robust_counterfactuals_sensitivity
 from src.result_analysis import plot_robust_constraint_relax_histogram
-from src.result_analysis import read_naive_costs
 
 # ------ Read simulations results ------
 # Import result files and concatenate them into a single Dataframe
@@ -51,12 +50,6 @@ for datasetName in datasetList:
     cfValidity, cfCost = read_cost_and_validity_from_results_df(
         methodDf, methoSensParameter, alphaList, nbAlphas, m_n_list, nbMns,
         nbSimulations, datasetName)
-    # Measure only cost difference to naive method
-    if SUBSTRACT_NAIVE_COSTS:
-        naiveDf = resultsDf[resultsDf['method'] == 'naive']
-        naiveCosts = read_naive_costs(naiveDf, nbSimulations, datasetName)
-        assert np.array_equal(naiveCosts, cfCost[0, 0, :])
-        cfCost = cfCost - naiveCosts
     # ------ Analysis of simulations results ------
     avgVal, valConf, avgCost, costConf = compute_kpis_and_confidence_intervals(
         cfValidity, cfCost, alphaList, nbMns, nbSimulations)
@@ -65,8 +58,7 @@ for datasetName in datasetList:
                        alphaList, experimentFolder, projectPath)
 
 # -------- Direct-SAA --------
-# Plot results: validity and robustness as a function of alpha
-# Export results of csv analysis to csv files
+# Calculate cost and validity with SAA constraint: h(x) ≥ p^*_{N, α}
 method = 'direct-saa'
 for datasetName in datasetList:
     resultFolderPath = subPath+datasetName+'/'
@@ -86,11 +78,6 @@ for datasetName in datasetList:
     cfValidity, cfCost = read_cost_and_validity_from_results_df(
         methodDf, methoSensParameter, alphaList, nbAlphas, m_n_list, nbMns,
         nbSimulations, datasetName)
-    # Measure only cost difference to naive method
-    if SUBSTRACT_NAIVE_COSTS:
-        naiveDf = resultsDf[resultsDf['method'] == 'naive']
-        naiveCosts = read_naive_costs(naiveDf, nbSimulations, datasetName)
-        cfCost = cfCost - naiveCosts
     # ------ Analysis of simulations results ------
     avgVal, valConf, avgCost, costConf = compute_kpis_and_confidence_intervals(
         cfValidity, cfCost, alphaList, nbMns, nbSimulations)
@@ -106,8 +93,7 @@ for datasetName in datasetList:
     plot_robust_constraint_relax_histogram(datasetName, resultsDf, alphaList)
 
 # -------- Robust-SAA --------
-# Plot results: validity and robustness as a function of alpha
-# Export results of csv analysis to csv files
+# Calculate cost and validity with SAA constraint: h(x) ≥ p^*_{N, α, β}
 method = 'robust-saa'
 robustDatasetList = ['Spambase']
 betaList = [0.10, 0.05]
@@ -131,11 +117,6 @@ for datasetName in robustDatasetList:
         cfValidity, cfCost = read_cost_and_validity_from_results_df(
             betaDf, methoSensParameter, alphaList, nbAlphas, m_n_list, nbMns,
             nbSimulations, datasetName)
-        # Measure only cost difference to naive method
-        if SUBSTRACT_NAIVE_COSTS:
-            naiveDf = resultsDf[resultsDf['method'] == 'naive']
-            naiveCosts = read_naive_costs(naiveDf, nbSimulations, datasetName)
-            cfCost = cfCost - naiveCosts
         # ------ Analysis of simulations results ------
         avgVal, valConf, avgCost, costConf = compute_kpis_and_confidence_intervals(
             cfValidity, cfCost, alphaList, nbMns, nbSimulations)
@@ -153,8 +134,6 @@ for datasetName in robustDatasetList:
             datasetName, resultsDf, alphaList)
 
 # -------- Isolation Forest --------
-# Plot results: validity and robustness as a function of alpha
-# Export results of csv analysis to csv files
 method = 'isolation-forest'
 for datasetName in datasetList:
     resultFolderPath = subPath+datasetName+'/'
@@ -174,11 +153,6 @@ for datasetName in datasetList:
     cfValidity, cfCost = read_cost_and_validity_from_results_df(
         methodDf, methoSensParameter,  contaminationList, nbCont, m_n_list,
         nbMns, nbSimulations, datasetName)
-    # Measure only cost difference to naive method
-    if SUBSTRACT_NAIVE_COSTS:
-        naiveDf = resultsDf[resultsDf['method'] == 'naive']
-        naiveCosts = read_naive_costs(naiveDf, nbSimulations, datasetName)
-        cfCost = cfCost - naiveCosts
     # ------ Analysis of simulations results ------
     avgVal, valConf, avgCost, costConf = compute_kpis_and_confidence_intervals(
         cfValidity, cfCost, contaminationList, nbMns, nbSimulations)
@@ -195,8 +169,6 @@ for datasetName in datasetList:
         datasetName, resultsDf, contaminationList)
 
 # -------- Local outlier factor --------
-# Plot results: validity and robustness as a function of alpha
-# Export results of csv analysis to csv files
 method = 'lof'
 lofDatasetList = ['German-Credit', 'Students-Performance', 'Spambase',
                   'COMPAS', 'Phishing', 'Credit-Card-Default', 'Adult',
@@ -219,11 +191,6 @@ for datasetName in lofDatasetList:
     cfValidity, cfCost = read_cost_and_validity_from_results_df(
         methodDf, methoSensParameter,  lofWeightList, nbWeights, m_n_list,
         nbMns, nbSimulations, datasetName)
-    # Measure only cost difference to naive method
-    if SUBSTRACT_NAIVE_COSTS:
-        naiveDf = resultsDf[resultsDf['method'] == 'naive']
-        naiveCosts = read_naive_costs(naiveDf, nbSimulations, datasetName)
-        cfCost = cfCost - naiveCosts
     # ------ Analysis of simulations results ------
     avgVal, valConf, avgCost, costConf = compute_kpis_and_confidence_intervals(
         cfValidity, cfCost, lofWeightList, nbMns, nbSimulations)
@@ -240,6 +207,7 @@ for datasetName in lofDatasetList:
         datasetName, resultsDf, lofWeightList)
 
 # -------- Computation times --------
+# Compare the times of the different methods to obtain a counterfactual
 methodList = ['naive', 'direct-saa', 'isolation-forest', 'lof', 'robust-saa']
 runtimesDf = pd.DataFrame()
 for method in methodList:

@@ -5,6 +5,7 @@ from ocean.CounterFactualParameters import FeatureActionnability
 from ocean.CounterFactualParameters import FeatureType
 from ocean.CounterFactualParameters import isFeatureTypeScalable
 
+
 def is_categorical_feature(column, columnFeatures):
     if column != 'Class' and columnFeatures[column] == FeatureType.Categorical:
         return True

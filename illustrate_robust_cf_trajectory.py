@@ -1,5 +1,5 @@
 """
-Plot the trajectory of robust counterfactuals in two dimensions for a single
+Plot the trajectory of robust counterfactuals as a heatmap for an
 initial observation with varying robustness target (1-α).
 """
 # Import packages
@@ -11,11 +11,6 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from src.CfSimulator import CfSimulator
 from src.result_analysis import re_encode_categorical_features
-
-# Set parameters of matplotlib to avoid Type 3 fonts as per NeurIPS guidelines
-plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
-plt.rcParams["font.family"] = "Times New Roman"
 
 
 def get_cf_trajectory_as_array(cf, oneHotEncodedFeatures, paramList,
@@ -35,6 +30,11 @@ def get_cf_trajectory_as_array(cf, oneHotEncodedFeatures, paramList,
     cfTrajArray = np.array(cfTrajectory)
     return cfTrajArray
 
+
+# Set parameters of matplotlib to avoid Type 3 fonts as per NeurIPS guidelines
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+plt.rcParams["font.family"] = "Times New Roman"
 
 # ------ Read simulations results ------
 METHOD = 'direct-saa'  # 'direct-saa'
@@ -67,6 +67,7 @@ for datasetName in datasetList:
     for cf in np.unique(simInstanceDf['x_init']):
         initCfs.append(np.fromstring(cf[1: -1], dtype=float, sep=' '))
 
+    # Read and order the values of the method sensitivity parameter
     if METHOD_SENS_PARAM == 'alpha':
         paramList = -np.sort(-pd.unique(methodDf[METHOD_SENS_PARAM]))
     else:

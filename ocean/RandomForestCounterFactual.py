@@ -8,7 +8,7 @@ from src.local_outlier_factor import l1_norm_with_scaling_factor
 # Import OCEAN functions
 from ocean.TreeMilpManager import TreeInMilpManager
 from ocean.ClassifierCounterFactual import ClassifierCounterFactualMilp
-from ocean.RandomAndIsolationForest import RandomAndIsolationAndVarianceForest
+from ocean.RandomAndIsolationForest import RandomAndIsolationForest
 from ocean.CounterFactualParameters import TreeConstraintsType, eps
 from ocean.CounterFactualParameters import BinaryDecisionVariables, FeatureType
 
@@ -44,7 +44,7 @@ class RandomForestCounterFactualMilp(ClassifierCounterFactualMilp):
         self.calibratedAlpha = calibratedAlpha
         # Combine elevant forests into completeForest
         self.isolationForest = isolationForest
-        self.completeForest = RandomAndIsolationAndVarianceForest(
+        self.completeForest = RandomAndIsolationForest(
             self.clf, isolationForest=self.isolationForest)
         # Avoid numerical errors
         self.epsSplit = eps
@@ -98,12 +98,7 @@ class RandomForestCounterFactualMilp(ClassifierCounterFactualMilp):
                 self.treePrediction[tree] == treePredictLinExpr, "treePredCstr_"+str(tree))
 
     def treePredictionLinExprFromTreeMng(self, treeMng, forestType):
-        """ Get tree prediction as a linear expression.
-        Note that Breiman's original random forests use hard voting whereas
-        scikitlearn's default forests use soft voting, see
-        https://scikit-learn.org/stable/modules/ensemble.html#b2001
-        paragraph 1.11.2.1. Random Forests
-        """
+        """ Get tree prediction as a linear expression. """
         USE_TREE_HARD_VOTING = False
         treePredictLinExpr = 0.0
         for node in range(treeMng.n_nodes):
@@ -156,21 +151,12 @@ class RandomForestCounterFactualMilp(ClassifierCounterFactualMilp):
                                  >= 1/2 + self.epsSplit - self.targetRelax, "targetClassConstraint")
 
     def addIsolationForestPlausibilityConstraint(self):
-        # --- Code from github repository ---
-        # expr = gp.LinExpr(0.0)
-        # for t in self.completeForest.isolationForestEstimatorsIndices:
-        #     tm = self.treeManagers[t]
-        #     tree = self.completeForest.estimators_[t]
-        #     expr -= _average_path_length(
-        #         [self.isolationForest.max_samples_])[0]
-        #     for v in range(tm.n_nodes):
-        #         if tm.is_leaves[v]:
-        #             leafDepth = tm.node_depth[v] + _average_path_length(
-        #                 [tree.tree_.n_node_samples[v]])[0]
-        #             expr += leafDepth * tm.y_var[v]
-        # self.model.addConstr(expr >= 0, "isolationForestInlierConstraint")
-
-        # --- My implementation ---
+        """
+        Add a plausibility constraint based on isolation forests.
+        The OCEAN implementation is adapted to use varying contamination
+        parameter. The contamination and anomaly score are implemented
+        as in scikit-learn.
+        """
         ilfTreeIndices = self.completeForest.isolationForestEstimatorsIndices
         self.ilfTreeDepth = dict()
         for t in ilfTreeIndices:
@@ -431,7 +417,7 @@ class RandomForestCounterFactualMilp(ClassifierCounterFactualMilp):
     def get_l1_norm_to_training_samples(self, absValUpperBound, nbTraining):
         """
         Get the l1-norm between the counterfactual explanation
-        and all samples in the training set using a scaling factor
+        and all samples in the (restricted) training set using a scaling factor
         for discrete features.
         """
         self.trainAbsDiffs = dict()
@@ -467,6 +453,12 @@ class RandomForestCounterFactualMilp(ClassifierCounterFactualMilp):
                 "trainAbsConstr_"+str(i))
 
     def addLOFPenaltyCost(self):
+        """
+        Implement the 1-local outlier factor as a penalty cost similar to:
+        Kanamori, K., Takagi, T., Kobayashi, K., & Arimura, H. (2020, July).
+        DACE: Distribution-Aware Counterfactual Explanation by Mixed-Integer
+        Linear Optimization. In IJCAI (pp. 2855-2862).
+        """
         absValUpperBound = self.nFeatures+1
         nbTraining = len(self.x_targetClass)
         # Calcualte l1 distance between x_cf and each training sample
@@ -571,8 +563,8 @@ class RandomForestCounterFactualMilp(ClassifierCounterFactualMilp):
         # The target constraint is relaxed with high penalty cost
         # to always allow a feasible solution.
         # Infeasibility may happen for instance:
-        # - with non-actionable features
-        # - very low low error tolerance
+        # - with non-actionable features,
+        # - very low error tolerance.
         PENALTY_FACTOR = 5000 * len(self.featuresType)
         self.obj += PENALTY_FACTOR * self.targetRelax
         self.model.setObjective(self.obj, GRB.MINIMIZE)

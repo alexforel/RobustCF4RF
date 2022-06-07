@@ -29,13 +29,8 @@ class CfSimulator():
         self.dataSeed = dataSeed
         self.objectiveNorm = 1
         self.testSplitFactor = testSplitFactor
-        # Sample training set, init counterfactuals and test set
-        listOfAvailableDatasets = ['Adult', 'COMPAS', 'Credit-Card-Default',
-                                   'German-Credit', 'OnlineNewsPopularity',
-                                   'Phishing', 'Spambase', 'Students-Performance']
         self.__read_data_from_file_and_divide_in_train_init_test(
             datasetName)
-        # Real-world datasets use different features stored in dataframe
         self.nbFeatures = len(self.reader.featuresType)
 
     # - Methods for initialisation -

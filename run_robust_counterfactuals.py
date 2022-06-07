@@ -16,7 +16,7 @@ gurobiEnv.start()
 
 # ---- Create simulation setting with synthetic data ----
 # Simulation setting parameters
-NB_SIMULATIONS = 40
+NB_SIMULATIONS = 2
 BATCH_SIZE = 5  # number of counterfactuals per simulation run
 # Define list of datasets from all available:
 datasetList = ['German-Credit', 'Students-Performance', 'Spambase',

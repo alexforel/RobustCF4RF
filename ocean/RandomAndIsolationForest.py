@@ -1,14 +1,6 @@
-class RandomAndIsolationAndVarianceForest:
+class RandomAndIsolationForest:
     """
-    Combines all forests and trees into a single compleForest object.
-    The complete forest may include:
-        - the random forest classifier,
-        - an isolation forest to improve plausibility,
-        - a variance estimation forest,
-        - a standard deviation regressor (tree or forest),
-        - a regressor to predict the expected forest score (tree or forest),
-        - neighbour forests, which are copies of the initial random forest
-          classifier to track the score of neighbour of x_cf.
+    Combine the input random and isolation forests into a single object.
     """
 
     def __init__(self, randomForest, isolationForest=None):
