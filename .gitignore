@@ -1,0 +1,8 @@
+# Ignore objects and archives, anywhere in the tree.
+*.asv
+*.png
+*.pyc
+*.pdf
+# Ignore output data
+/output/*.csv
+/output/**/*.csv

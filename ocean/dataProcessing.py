@@ -1,4 +1,5 @@
 import pandas as pd
+import copy as copy
 from ocean.CounterFactualParameters import getFeatureType
 from ocean.CounterFactualParameters import getFeatureActionnability
 from ocean.CounterFactualParameters import FeatureActionnability
@@ -114,6 +115,8 @@ class DatasetReader:
                 self.data[column] = self.data[column].astype(float)
             elif columnFeatures[column] == FeatureType.Binary:
                 self.data[column] = self.data[column].astype(float)
+
+        self.unscaledData = copy.deepcopy(self.data)
 
         # apply min-max scaling
         self.lowerBounds = dict()
