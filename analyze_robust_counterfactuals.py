@@ -24,7 +24,7 @@ datasetList = ['Students-Performance', 'German-Credit', 'Spambase',
                'COMPAS', 'Phishing', 'Credit-Card-Default',
                'OnlineNewsPopularity', 'Adult']
 # Specify subfolder for results files
-projectPath = 'C:/Code/robust-counterfactuals/'
+projectPath = os.path.dirname(__file__)
 experimentFolder = 'robustTrainingCounterfactuals'
 subPath = projectPath+'/output/'+experimentFolder+'/'
 SUBSTRACT_NAIVE_COSTS = False
