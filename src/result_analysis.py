@@ -130,8 +130,12 @@ def compute_kpis_and_confidence_intervals(cfValidity, cfCost, alphaList,
 
 
 def export_results_csv(method, datasetName, avgVal, valConf, avgCost, costConf,
-                       alphaList, experimentFolder, projectPath):
-    dfToExport = pd.DataFrame({'confLevel': 1-alphaList})
+                       alphaList, experimentFolder, projectPath,
+                       invert_alpha=True):
+    if invert_alpha:
+        dfToExport = pd.DataFrame({'confLevel': 1-alphaList})
+    else:
+        dfToExport = pd.DataFrame({'tau': alphaList})
     dfToExport[method+'-cost'] = avgCost[:, 0]
     dfToExport[method+'-cost-lb'] = avgCost[:, 0] - costConf[:, 0]
     dfToExport[method+'-cost-ub'] = avgCost[:, 0] + costConf[:, 0]
